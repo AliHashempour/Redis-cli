@@ -3,11 +3,20 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"go-memory/handler"
+	"go-memory/internal/repository"
+	"go-memory/internal/storage"
 	"os"
 	"strings"
 )
 
 func main() {
+
+	store := storage.NewStorage()
+	db := store.CurrentDatabase
+
+	commandHandler := handler.NewCommandHandler(repository.NewMemoryRepository(db))
+
 	scanner := bufio.NewScanner(os.Stdin)
 	fmt.Println("In-app Key-Value Store")
 
@@ -28,26 +37,19 @@ func main() {
 			if len(parts) != 3 {
 				fmt.Println("Usage: set <key> <value>")
 			} else {
-				key := parts[1]
-				value := parts[2]
-				// Placeholder for set function
-				fmt.Printf("Setting %s to %s\n", key, value)
+				fmt.Println(commandHandler.SetCommand(parts[1], parts[2]))
 			}
 		case "get":
 			if len(parts) != 2 {
 				fmt.Println("Usage: get <key>")
 			} else {
-				key := parts[1]
-				// Placeholder for get function
-				fmt.Printf("Getting value for %s\n", key)
+				fmt.Println(commandHandler.GetCommand(parts[1]))
 			}
 		case "del":
 			if len(parts) != 2 {
 				fmt.Println("Usage: del <key>")
 			} else {
-				key := parts[1]
-				// Placeholder for delete function
-				fmt.Printf("Deleting %s\n", key)
+				fmt.Println(commandHandler.DeleteCommand(parts[1]))
 			}
 		case "keys":
 			if len(parts) != 2 {
