@@ -56,8 +56,23 @@ func main() {
 				fmt.Println("Usage: keys <regex>")
 			} else {
 				regex := parts[1]
-				// Placeholder for keys function
+				// todo Placeholder for keys function
 				fmt.Printf("Searching keys with pattern %s\n", regex)
+			}
+		case "list":
+			fmt.Println(commandHandler.ListDatabasesCommand(store))
+		case "use":
+			if len(parts) < 2 {
+				fmt.Println("Usage: use <dbName>")
+			} else {
+				dbName := parts[1]
+				_, err := store.UseDatabase(dbName)
+				if err != nil {
+					fmt.Println("Failed to switch database:", err)
+				} else {
+					fmt.Printf("Switched to database: %s\n", dbName)
+					commandHandler = handler.NewCommandHandler(repository.NewMemoryRepository(store.CurrentDatabase))
+				}
 			}
 		case "exit":
 			fmt.Println("Exiting...")

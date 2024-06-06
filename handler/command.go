@@ -1,7 +1,10 @@
 package handler
 
 import (
+	"encoding/json"
+	"fmt"
 	"go-memory/internal/repository"
+	"go-memory/internal/storage"
 )
 
 // CommandHandler holds a repository to perform database operations.
@@ -36,4 +39,21 @@ func (h *CommandHandler) DeleteCommand(key string) string {
 		return err.Error()
 	}
 	return "OK"
+}
+
+func (h *CommandHandler) ListDatabasesCommand(s *storage.Storage) string {
+	databases := s.ListAllDatabases()
+	jsonData, err := json.Marshal(databases)
+	if err != nil {
+		return "Error formatting database list"
+	}
+	return string(jsonData)
+}
+
+func (h *CommandHandler) UseDatabaseCommand(s *storage.Storage, dbName string) string {
+	_, err := s.UseDatabase(dbName)
+	if err != nil {
+		return err.Error()
+	}
+	return fmt.Sprintf("Switched to or created and using database: %s", dbName)
 }
