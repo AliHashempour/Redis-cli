@@ -17,20 +17,29 @@ func NewCommandHandler(repo repository.Repository) *CommandHandler {
 	return &CommandHandler{Repo: repo}
 }
 
-func (h *CommandHandler) SetCommand(key string, value interface{}) string {
-	err := h.Repo.SetKey(key, value)
+func (h *CommandHandler) SetCommand(key string, value string) string {
+	var parsedValue interface{}
+	err := json.Unmarshal([]byte(value), &parsedValue)
+	if err != nil {
+		parsedValue = value
+	}
+	err = h.Repo.SetKey(key, parsedValue)
 	if err != nil {
 		return err.Error()
 	}
-	return "OK"
+	return "Ok"
 }
 
-func (h *CommandHandler) GetCommand(key string) interface{} {
+func (h *CommandHandler) GetCommand(key string) string {
 	value, err := h.Repo.GetKey(key)
 	if err != nil {
 		return err.Error()
 	}
-	return value
+	jsonData, err := json.Marshal(value)
+	if err != nil {
+		return err.Error()
+	}
+	return string(jsonData)
 }
 
 func (h *CommandHandler) DeleteCommand(key string) string {
@@ -64,11 +73,10 @@ func (h *CommandHandler) KeysCommand(pattern string) string {
 		return err.Error()
 	}
 
-	// Convert the keys list to JSON format
 	jsonData, err := json.Marshal(keys)
 	if err != nil {
 		return err.Error()
 	}
 
-	return string(jsonData) // Return JSON formatted string
+	return string(jsonData)
 }
