@@ -57,3 +57,18 @@ func (h *CommandHandler) UseDatabaseCommand(s *storage.Storage, dbName string) s
 	}
 	return fmt.Sprintf("Switched to or created and using database: %s", dbName)
 }
+
+func (h *CommandHandler) KeysCommand(pattern string) string {
+	keys, err := h.Repo.RegexSearchKeys(pattern)
+	if err != nil {
+		return err.Error()
+	}
+
+	// Convert the keys list to JSON format
+	jsonData, err := json.Marshal(keys)
+	if err != nil {
+		return err.Error()
+	}
+
+	return string(jsonData) // Return JSON formatted string
+}

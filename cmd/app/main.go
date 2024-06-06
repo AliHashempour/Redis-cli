@@ -23,9 +23,8 @@ func main() {
 	for {
 		fmt.Print("> ")
 		if !scanner.Scan() {
-			break // Exit the loop on EOF or read error.
+			break
 		}
-
 		command := scanner.Text()
 		parts := strings.Fields(command)
 		if len(parts) == 0 {
@@ -53,12 +52,12 @@ func main() {
 			}
 		case "keys":
 			if len(parts) != 2 {
-				fmt.Println("Usage: keys <regex>")
+				fmt.Println("Usage: keys <regex_pattern>")
 			} else {
 				regex := parts[1]
-				// todo Placeholder for keys function
-				fmt.Printf("Searching keys with pattern %s\n", regex)
+				fmt.Println(commandHandler.KeysCommand(regex))
 			}
+
 		case "list":
 			fmt.Println(commandHandler.ListDatabasesCommand(store))
 		case "use":

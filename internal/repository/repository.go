@@ -9,6 +9,7 @@ type Repository interface {
 	SetKey(key string, value interface{}) error
 	GetKey(key string) (interface{}, error)
 	DeleteKey(key string) error
+	RegexSearchKeys(pattern string) ([]string, error)
 }
 
 type MemoryRepository struct {
@@ -41,4 +42,11 @@ func (m *MemoryRepository) DeleteKey(key string) error {
 		return errors.New("error while deleting key : " + err.Error())
 	}
 	return nil
+}
+func (m *MemoryRepository) RegexSearchKeys(pattern string) ([]string, error) {
+	search, err := m.db.RegexSearch(pattern)
+	if err != nil {
+		return nil, errors.New("error while getting key : " + err.Error())
+	}
+	return search, nil
 }

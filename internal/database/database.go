@@ -2,6 +2,7 @@ package database
 
 import (
 	"errors"
+	"regexp"
 	"sync"
 )
 
@@ -42,4 +43,18 @@ func (db *Database) Delete(key string) error {
 	}
 	delete(db.Data, key)
 	return nil
+}
+
+func (db *Database) RegexSearch(pattern string) ([]string, error) {
+	var matches []string
+	regex, err := regexp.Compile(pattern)
+	if err != nil {
+		return nil, err
+	}
+	for key := range db.Data {
+		if regex.MatchString(key) {
+			matches = append(matches, key)
+		}
+	}
+	return matches, nil
 }
