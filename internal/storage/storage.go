@@ -1,8 +1,6 @@
 package storage
 
 import (
-	"errors"
-	"fmt"
 	"go-memory/internal/database"
 )
 
@@ -20,24 +18,28 @@ func NewStorage() *Storage {
 }
 
 func (s *Storage) AddDatabase(name string) (*database.Database, error) {
-	if s.CheckDBExists(name) {
-		return nil, errors.New(fmt.Sprintf("Database %s is already created", name))
-	}
 
 	newDb := database.NewDatabase(name)
 	s.AllDatabases = append(s.AllDatabases, newDb)
 	return newDb, nil
 }
 
-func (s *Storage) ListAllDatabases() []string {
-	var names []string
-	for _, db := range s.AllDatabases {
-		names = append(names, db.Name)
+func (s *Storage) UseDatabase(name string) (*database.Database, error) {
+	db, exists := s.CheckDBExists(name)
+	if exists {
+		s.CurrentDatabase = db
+		return db, nil
 	}
-	return names
+	// Database not found, create a new one
+	newDb, err := s.AddDatabase(name)
+	if err != nil {
+		return nil, err
+	}
+	s.CurrentDatabase = newDb
+	return newDb, nil
 }
 
-func (s *Storage) GetDb(name string) (*database.Database, bool) {
+func (s *Storage) CheckDBExists(name string) (*database.Database, bool) {
 	for _, db := range s.AllDatabases {
 		if db.Name == name {
 			return db, true
@@ -46,11 +48,10 @@ func (s *Storage) GetDb(name string) (*database.Database, bool) {
 	return nil, false
 }
 
-func (s *Storage) CheckDBExists(name string) bool {
+func (s *Storage) ListAllDatabases() []string {
+	var names []string
 	for _, db := range s.AllDatabases {
-		if db.Name == name {
-			return true
-		}
+		names = append(names, db.Name)
 	}
-	return false
+	return names
 }
